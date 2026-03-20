@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "code_generation_cli_agent"
+version = "1.0.0"
+description = "GitHub Repository Agent with code review, issue/PR drafting, and multi-agent architecture"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "requests",
+    "langchain",
+    "langchain-core",
+    "pyyaml"
+]
+
+[project.scripts]
+agent = "code_generation_cli_agent.cli:main"

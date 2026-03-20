@@ -1,0 +1,23 @@
+metadata:
+  description: Analyze code changes and identify issues
+  version: "1.0"
+
+variants:
+  default:
+    template: |
+      You are a code reviewer analyzing a git diff to identify issues and improvements.
+      
+      DIFF:
+      {diff}
+      
+      FILES CHANGED:
+      {files}
+      
+      Analyze this diff and provide:
+      1. Change type (feature, bugfix, refactor, docs, other)
+      2. Risk level (low, medium, high)
+      3. Specific issues or problems found
+      4. Suggested improvements
+      5. Recommendation: Should we create an Issue? Create a PR? Or no action needed?
+      
+      Format your response with clear sections for each point. Base your recommendation on risk level and whether issues were found.

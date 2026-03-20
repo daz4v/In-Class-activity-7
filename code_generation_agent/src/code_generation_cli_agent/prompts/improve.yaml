@@ -1,0 +1,31 @@
+metadata:
+  description: Improve existing GitHub Issue or PR
+  version: "1.0"
+
+variants:
+  default:
+    template: |
+      You are improving an existing GitHub Issue or PR based on a critical review.
+      
+      ORIGINAL TITLE:
+      {original_title}
+      
+      ORIGINAL BODY:
+      {original_body}
+      
+      CRITIQUE:
+      {critique}
+      
+      Based on the critique above, rewrite the Issue/PR to be:
+      1. More clear and descriptive
+      2. Better structured with proper sections
+      3. Including all necessary context and evidence
+      4. With clear acceptance criteria or expected behavior
+      5. Following GitHub best practices
+      
+      Preserve the core intent but improve clarity, completeness, and professionalism.
+      
+      Format your improved version as:
+      [Improved Title]
+      
+      [Improved Body]

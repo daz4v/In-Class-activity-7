@@ -1,0 +1,28 @@
+metadata:
+  description: Critique draft content for quality and completeness
+  version: "1.0"
+
+variants:
+  default:
+    template: |
+      You are a critical reviewer examining a {draft_type} draft for a GitHub repository.
+      
+      TITLE:
+      {title}
+      
+      BODY:
+      {body}
+      
+      Analyze this {draft_type} draft and evaluate:
+      1. Is the title clear and descriptive?
+      2. Does the body provide sufficient context and evidence?
+      3. Are acceptance criteria or expected behavior clearly defined?
+      4. Are there any missing sections or vague language?
+      5. Does it follow best practices for GitHub {draft_type}s?
+      
+      Provide your verdict: PASS or FAIL
+      List any issues or problems found.
+      Suggest improvements for clarity and completeness.
+      
+      If PASS: The draft is ready for approval.
+      If FAIL: Suggest revisions before approval.
