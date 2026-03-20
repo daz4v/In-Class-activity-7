@@ -26,7 +26,12 @@ variants:
       4. Acceptance criteria or next steps
       5. Labels (if applicable)
       
-      IMPORTANT: Use plain text only. Do NOT use emojis or special Unicode characters.
+      IMPORTANT OUTPUT RULES:
+      - Use plain text only.
+      - Do NOT use markdown in the title.
+      - Do NOT wrap title in **, *, _, `, or quotes.
+      - Do NOT prefix title with "Title:".
+      - Do NOT use emojis or special Unicode characters.
       
       Format:
       [Title Line]
@@ -57,7 +62,13 @@ variants:
       5. Test plan or validation steps
       6. Risk assessment
       
-      IMPORTANT: Use plain text only. Do NOT use emojis or special Unicode characters.
+      IMPORTANT OUTPUT RULES:
+      - Use plain text only.
+      - The first non-empty line MUST be the raw title text only.
+      - Do NOT use markdown in the title.
+      - Do NOT wrap title in **, *, _, `, or quotes.
+      - Do NOT prefix title with "Title:".
+      - Do NOT use emojis or special Unicode characters.
       
       Format:
       [Title Line]

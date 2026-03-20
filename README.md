@@ -28,6 +28,8 @@ Drafts GitHub Issues or Pull Requests with:
 ```bash
 agent draft issue --instruction "Add rate limiting to login endpoint"
 agent draft pr --instruction "Refactor duplicated pricing logic"
+agent draft pr --instruction "Create an PR from the current git diff review"
+agent draft issue --instruction "Create an issue from the current git diff review"
 agent approve --draft <draft_id> --yes
 ```
 
@@ -96,6 +98,11 @@ $env:GITHUB_REPO ="your_repo_name"
 
 ### Example Workflow
 CD to the local of the repo you want to edit   
+Remeber to  
+```bash
+git switch main
+```  
+after every pr created so you don't get duplication error
 
 ```bash
 # 1. Review recent changes

@@ -274,11 +274,43 @@ class Writer:
         if not title:
             title = "Code Improvement"
 
+        # Normalize markdown-style titles so GitHub receives plain text.
+        title = self._clean_title(title)
+
         body = "\n".join(body_lines).strip()
         if not body:
             body = response.strip()
 
         return title, body
+
+    def _clean_title(self, raw_title: str) -> str:
+        """Strip markdown decoration and common label prefixes from title."""
+        title = raw_title.strip()
+
+        if title.lower().startswith("title:"):
+            title = title.split(":", 1)[1].strip()
+
+        # Remove heading/list prefixes from model outputs.
+        while title.startswith("#"):
+            title = title[1:].strip()
+        if title.startswith("- ") or title.startswith("* "):
+            title = title[2:].strip()
+
+        # Remove surrounding markdown emphasis markers.
+        wrappers = ("**", "__", "`", "*", "_")
+        changed = True
+        while changed:
+            changed = False
+            for wrapper in wrappers:
+                if (
+                    title.startswith(wrapper)
+                    and title.endswith(wrapper)
+                    and len(title) > (len(wrapper) * 2)
+                ):
+                    title = title[len(wrapper) : -len(wrapper)].strip()
+                    changed = True
+
+        return title or "Code Improvement"
 
 
 class Gatekeeper:
@@ -525,7 +557,12 @@ class Agent:
         # GitHub API (optional)
         self.github = None
         if cfg.github_token and cfg.github_owner and cfg.github_repo:
-            self.github = GitHubTools(cfg.github_token, cfg.github_owner, cfg.github_repo)
+            self.github = GitHubTools(
+                cfg.github_token,
+                cfg.github_owner,
+                cfg.github_repo,
+                mcp_client=self.mcp_client,
+            )
 
     def _build_mcp_client(self, cfg: AgentConfig) -> MCPClient:
         if cfg.mcp_server_command:

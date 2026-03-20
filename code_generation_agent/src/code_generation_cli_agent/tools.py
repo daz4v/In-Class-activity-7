@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import requests
+import json
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -71,43 +71,52 @@ class Tools:
 class GitHubTools:
     """Interface to GitHub API."""
 
-    def __init__(self, token: str, owner: str, repo: str):
+    def __init__(self, token: str, owner: str, repo: str, mcp_client: MCPClient):
         self.token = token
         self.owner = owner
         self.repo = repo
-        self.base_url = f"https://api.github.com/repos/{owner}/{repo}"
-        self.headers = {
-            "Authorization": f"token {token}",
-            "Accept": "application/vnd.github.v3+json",
-        }
+        self.mcp_client = mcp_client
+
+    def _call_json(self, tool_name: str, arguments: dict) -> dict:
+        out = self.mcp_client.call_tool(tool_name, arguments)
+        if out.startswith("ERROR:"):
+            raise RuntimeError(out.replace("ERROR:", "", 1).strip())
+        try:
+            return json.loads(out)
+        except json.JSONDecodeError as exc:
+            raise RuntimeError(f"Invalid JSON returned by MCP tool '{tool_name}': {out}") from exc
 
     def get_issue(self, issue_number: int) -> Optional[dict]:
         """Fetch issue details."""
-        resp = requests.get(
-            f"{self.base_url}/issues/{issue_number}",
-            headers=self.headers,
-            timeout=10,
+        out = self.mcp_client.call_tool(
+            "github_get_issue",
+            {
+                "token": self.token,
+                "owner": self.owner,
+                "repo": self.repo,
+                "issue_number": issue_number,
+            },
         )
-        if resp.status_code == 200:
-            return resp.json()
-        return None
+        if out.startswith("ERROR:"):
+            return None
+        try:
+            return json.loads(out)
+        except json.JSONDecodeError:
+            return None
 
     def create_issue(self, title: str, body: str, labels: list[str] = None) -> Optional[dict]:
         """Create a GitHub issue."""
-        payload = {"title": title, "body": body}
+        args = {
+            "token": self.token,
+            "owner": self.owner,
+            "repo": self.repo,
+            "title": title,
+            "body": body,
+        }
         if labels:
-            payload["labels"] = labels
+            args["labels"] = labels
         try:
-            resp = requests.post(
-                f"{self.base_url}/issues",
-                headers=self.headers,
-                json=payload,
-                timeout=10,
-            )
-            if resp.status_code == 201:
-                return resp.json()
-            else:
-                raise RuntimeError(f"GitHub API error ({resp.status_code}): {resp.text}")
+            return self._call_json("github_create_issue", args)
         except Exception as e:
             raise RuntimeError(f"Failed to create issue: {e}")
 
@@ -115,47 +124,55 @@ class GitHubTools:
         self, title: str, body: str, head: str, base: str = "main"
     ) -> Optional[dict]:
         """Create a GitHub pull request."""
-        payload = {"title": title, "body": body, "head": head, "base": base}
         try:
-            resp = requests.post(
-                f"{self.base_url}/pulls",
-                headers=self.headers,
-                json=payload,
-                timeout=10,
+            return self._call_json(
+                "github_create_pull_request",
+                {
+                    "token": self.token,
+                    "owner": self.owner,
+                    "repo": self.repo,
+                    "title": title,
+                    "body": body,
+                    "head": head,
+                    "base": base,
+                },
             )
-            if resp.status_code == 201:
-                return resp.json()
-            else:
-                raise RuntimeError(f"GitHub API error ({resp.status_code}): {resp.text}")
         except Exception as e:
             raise RuntimeError(f"Failed to create PR: {e}")
 
     def update_issue(self, issue_number: int, title: str = None, body: str = None) -> Optional[dict]:
         """Update an existing issue."""
-        payload = {}
-        if title:
-            payload["title"] = title
-        if body:
-            payload["body"] = body
-        resp = requests.patch(
-            f"{self.base_url}/issues/{issue_number}",
-            headers=self.headers,
-            json=payload,
-            timeout=10,
-        )
-        if resp.status_code == 200:
-            return resp.json()
-        return None
+        args = {
+            "token": self.token,
+            "owner": self.owner,
+            "repo": self.repo,
+            "issue_number": issue_number,
+            "title": title,
+            "body": body,
+        }
+        out = self.mcp_client.call_tool("github_update_issue", args)
+        if out.startswith("ERROR:"):
+            return None
+        try:
+            return json.loads(out)
+        except json.JSONDecodeError:
+            return None
 
     def create_comment(self, issue_number: int, body: str) -> Optional[dict]:
         """Add a comment to an issue."""
-        payload = {"body": body}
-        resp = requests.post(
-            f"{self.base_url}/issues/{issue_number}/comments",
-            headers=self.headers,
-            json=payload,
-            timeout=10,
+        out = self.mcp_client.call_tool(
+            "github_create_comment",
+            {
+                "token": self.token,
+                "owner": self.owner,
+                "repo": self.repo,
+                "issue_number": issue_number,
+                "body": body,
+            },
         )
-        if resp.status_code == 201:
-            return resp.json()
-        return None
+        if out.startswith("ERROR:"):
+            return None
+        try:
+            return json.loads(out)
+        except json.JSONDecodeError:
+            return None
