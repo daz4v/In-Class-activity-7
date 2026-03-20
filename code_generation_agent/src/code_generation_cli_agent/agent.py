@@ -128,6 +128,9 @@ class Reviewer:
             elif "improve:" in l or "suggestion:" in l:
                 improvements.append(line.replace("improve:", "").replace("suggestion:", "").strip())
 
+        diff_excerpt = diff[:500].strip() if diff else ""
+        evidence = diff_excerpt or "Empty diff"
+
         return CodeReview(
             changes_summary=summary,
             change_type=change_type,
@@ -135,7 +138,7 @@ class Reviewer:
             issues_found=[i for i in issues if i],
             improvements=[i for i in improvements if i],
             recommendation=recommendation,
-            evidence=f"Analyzed {len(diff)} chars of diff",
+            evidence=evidence,
         )
 
 
